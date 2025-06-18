@@ -1,0 +1,45 @@
+openapi: 3.0.3
+info:
+  title: Exchanger Service API
+  version: 1.0.0
+  description: API для получения курсов обмена валют
+
+paths:
+  /api/v1/rate:
+    get:
+      summary: Получить курс обмена между валютами
+      operationId: getExchangeRate
+      parameters:
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            example: USD
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            example: RUB
+      responses:
+        '200':
+          description: Успешный ответ с курсом обмена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExchangeRateResponse'
+        '400':
+          description: Неверный запрос
+        '500':
+          description: Внутренняя ошибка сервера
+
+components:
+  schemas:
+    ExchangeRateResponse:
+      type: object
+      properties:
+        rate:
+          type: number
+          format: double
+          example: 89.45
