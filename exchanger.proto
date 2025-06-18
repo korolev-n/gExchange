@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package exchanger;
+
+option go_package = "exchangerpb";
+
+service ExchangeRateService {
+  rpc GetExchangeRate (ExchangeRateRequest) returns (ExchangeRateResponse);
+}
+
+message ExchangeRateRequest {
+  string from_currency = 1;
+  string to_currency = 2;
+}
+
+message ExchangeRateResponse {
+  double rate = 1;
+}
