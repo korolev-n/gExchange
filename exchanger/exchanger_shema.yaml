@@ -1,0 +1,21 @@
+openapi: 3.0.0
+info:
+  title: Exchanger Service
+  version: 1.0.0
+paths:
+  /v1/rates:
+    get:
+      summary: Получить курсы валют
+      operationId: GetRates
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rates:
+                    type: object
+                    additionalProperties:
+                      type: number
