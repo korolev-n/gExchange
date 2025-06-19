@@ -1,0 +1,74 @@
+version: "2"
+
+# Основные настройки
+run:
+  timeout: 5m              # Увеличено время выполнения для больших проектов
+  tests: true              # Проверять тестовые файлы
+  skip-dirs:              # Пропустить ненужные директории
+    - third_party
+    - builtin
+    - examples
+    - vendor
+    - mocks
+    - generated
+  skip-files:             # Пропустить специфичные файлы
+    - ".*_test\\.go$"     # Пример: можно исключить тесты при необходимости
+
+# Настройки линтеров
+linters:
+  enable:
+    - govet               # Базовые проверки (добавлено)
+    - staticcheck         # Статический анализ (добавлено)
+    - errcheck            # Проверка ошибок (добавлено)
+    # - gocritic            # Расширенные проверки стиля
+    # - gosec               # Проверка безопасности
+    # - revive              # Стиль кода
+    # - unconvert           # Обнаружение ненужных преобразований типов (добавлено)
+    # - ineffassign         # Обнаружение неэффективных присваиваний (добавлено)
+
+  disable:
+    - wsl                 # Можно отключить, если не нужны строгие требования к пустым строкам
+
+  settings:
+    gocritic:
+      enabled-tags:
+        - performance
+        - style
+        - diagnostic
+      disabled-checks:
+        - hugeParam        # Игнорировать предупреждения о больших параметрах
+        - regexpMust       # Игнорировать строгие проверки regexp
+
+    revive:
+      severity: warning
+      ignore-generated-header: true
+      rules:
+        - name: indent-error-flow
+        - name: var-naming
+        - name: package-comments
+        - name: exported
+        - name: blank-imports
+        - name: error-strings
+        - name: receiver-naming
+        - name: context-as-argument # Проверка передачи context в методах
+
+    gosec:
+      excludes:           # Исключения для gosec
+        - G104           # Игнорировать предупреждения о необработанных ошибках
+        - G107           # Игнорировать предупреждения о URL в http.NewRequest
+
+# Настройки обработки проблем
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 50  # Ограничить количество проблем на линтер
+  max-same-issues: 10        # Ограничить количество одинаковых проблем
+  exclude:
+    - "func .* is unused"    # Игнорировать неиспользуемые функции
+    - "Error return value.*" # Игнорировать некоторые необработанные ошибки
+
+# Настройки форматирования
+output:
+  format: colored-line-number  # Цветной вывод
+  sort-results: true          # Сортировка по важности
+  print-issued-lines: true    # Показывать проблемные строки
+  print-linter-name: true     # Показывать имя линтера
