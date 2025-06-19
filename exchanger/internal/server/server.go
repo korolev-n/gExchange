@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"database/sql"
 	"log/slog"
 	"net/http"
 
@@ -10,10 +11,14 @@ import (
 
 type Server struct {
 	log *slog.Logger
+	db  *sql.DB
 }
 
-func New(log *slog.Logger) *Server {
-	return &Server{log: log}
+func New(log *slog.Logger, db *sql.DB) *Server {
+	return &Server{
+		log: log,
+		db:  db,
+	}
 }
 
 type contextKey string
