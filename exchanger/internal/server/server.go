@@ -16,6 +16,14 @@ func New(log *slog.Logger) *Server {
 	return &Server{log: log}
 }
 
+type contextKey string
+
+const (
+	RequestIDKey contextKey = "request_id"
+	MethodKey    contextKey = "method"
+	PathKey      contextKey = "path"
+)
+
 func (s *Server) Start(port string) error {
 
 	s.log.Info("Starting server", "port", port)
@@ -33,9 +41,9 @@ func (s *Server) addContextMiddleware(next http.Handler) http.Handler {
 		ctx := r.Context()
 
 		requestID := uuid.New().String()
-		ctx = context.WithValue(ctx, "request_id", requestID)
-		ctx = context.WithValue(ctx, "method", r.Method)
-		ctx = context.WithValue(ctx, "path", r.URL.Path)
+		ctx = context.WithValue(ctx, RequestIDKey, requestID)
+		ctx = context.WithValue(ctx, MethodKey, r.Method)
+		ctx = context.WithValue(ctx, PathKey, r.URL.Path)
 
 		logger := s.log.With(
 			slog.String("request_id", requestID),
