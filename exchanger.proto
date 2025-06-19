@@ -2,17 +2,14 @@ syntax = "proto3";
 
 package exchanger;
 
-option go_package = "exchangerpb";
+option go_package = "exchanger/api;api";
 
-service ExchangeRateService {
-  rpc GetExchangeRate (ExchangeRateRequest) returns (ExchangeRateResponse);
+service ExchangeService {
+  rpc GetRates (GetRatesRequest) returns (GetRatesResponse);
 }
 
-message ExchangeRateRequest {
-  string from_currency = 1;
-  string to_currency = 2;
-}
+message GetRatesRequest {}
 
-message ExchangeRateResponse {
-  double rate = 1;
+message GetRatesResponse {
+  map<string, float> rates = 1; // USD, EUR, RUB
 }
