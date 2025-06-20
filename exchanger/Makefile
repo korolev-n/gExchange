@@ -10,7 +10,7 @@ lint:
 	golangci-lint run
 
 migrate-up:
-	migrate -path migrations -database $$DB_URL up
+	migrate -path=./migrations -database=$DB_URL up
 
 migrate-down:
-	migrate -path migrations -database $$DB_URL down
+	migrate -path=./migrations -database $$DB_URL down
