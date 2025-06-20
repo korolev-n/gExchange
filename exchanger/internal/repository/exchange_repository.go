@@ -21,7 +21,7 @@ func NewPostgresRepo(db *sql.DB) ExchangeRepository {
 
 func (r *postgresRepo) GetLatestRates(ctx context.Context) ([]domain.ExchangeRate, error) {
 	query := `
-        SELECT currency, rate_to_rub 
+        SELECT set_date, currency, rate_to_rub 
         FROM exchange_rates 
         WHERE set_date = (SELECT MAX(set_date) FROM exchange_rates)
     `
@@ -34,7 +34,7 @@ func (r *postgresRepo) GetLatestRates(ctx context.Context) ([]domain.ExchangeRat
 	var rates []domain.ExchangeRate
 	for rows.Next() {
 		var rate domain.ExchangeRate
-		if err := rows.Scan(&rate.Currency, &rate.RateToRub, &rate.SetDate); err != nil {
+		if err := rows.Scan(&rate.SetDate, &rate.Currency, &rate.RateToRub); err != nil {
 			return nil, err
 		}
 		rates = append(rates, rate)
