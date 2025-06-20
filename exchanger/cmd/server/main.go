@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -39,40 +38,29 @@ func main() {
 	}()
 
 	repo := repository.NewPostgresRepo(database)
-	service := service.NewExchangeService(repo)
-	handler := httptransport.New(service, logger)
+	svc := service.NewExchangeService(repo)
 
-	srv := server.New(logger, database, handler) // init http
+	httpHandler := httptransport.New(svc, logger)
+	httpServer := server.New(logger, database, httpHandler)
 
-	grpcHandler := grpc.New(service, logger)
-	grpcServer := grpc.NewGRPCServer(grpcHandler, logger) // init grpc
+	grpcHandler := grpc.New(svc, logger)
+	grpcServer := grpc.NewGRPCServer(grpcHandler, logger)
+
+	app := server.NewAppServers(httpServer, grpcServer, logger)
+
+	if err := app.Start(cfg.ServerPort, ":50051"); err != nil {
+		logger.Error("Failed to start servers", "error", err)
+		return
+	}
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
-
-	go func() {
-		logger.Info("Starting HTTP server", "port", cfg.ServerPort)
-		if err := srv.Start(cfg.ServerPort); err != nil && err != http.ErrServerClosed {
-			logger.Error("HTTP server failed", "error", err)
-		}
-	}()
-
-	go func() {
-		logger.Info("Starting gRPC server", "port", ":50051")
-		if err := grpcServer.Start(":50051", logger); err != nil {
-			logger.Error("gRPC server failed", "error", err)
-		}
-	}()
-
 	<-ctx.Done()
 
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	if err := srv.Shutdown(shutdownCtx); err != nil {
+	if err := app.Shutdown(shutdownCtx); err != nil {
 		logger.Error("Graceful shutdown failed", "error", err)
 	}
-
-	logger.Info("Shutting down gRPC server")
-	grpcServer.Stop()
 }
