@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -17,6 +18,9 @@ import (
 )
 
 func main() {
+	dir, _ := os.Getwd()
+	fmt.Println("Current working directory:", dir)
+	
 	cfg, err := config.Load()
 	if err != nil {
 		panic(err)
