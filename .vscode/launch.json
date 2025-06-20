@@ -1,0 +1,22 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch Package",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/exchanger/cmd/server/main.go",
+            "envFile": "${workspaceFolder}/exchanger/.env",
+            // "env": {
+            //     "DB_URL": "postgres://exchanger_user:pa55word@localhost:5432/exchanger?sslmode=disable",
+            //     "SERVER_PORT": "8080",
+            //     "LOG_LEVEL": "debug"
+            // },
+        }
+    ]
+}

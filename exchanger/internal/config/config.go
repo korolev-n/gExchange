@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/joho/godotenv"
 )
@@ -14,7 +15,7 @@ type Config struct {
 }
 
 func Load() (*Config, error) {
-	if err := godotenv.Load(); err != nil {
+	if err := godotenv.Load(filepath.Join("exchanger", ".env")); err != nil {
 		return nil, fmt.Errorf("loading env: %w", err)
 	}
 
