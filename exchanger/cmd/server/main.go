@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -14,13 +14,12 @@ import (
 	"github.com/korolev-n/gExchange/exchanger/internal/repository"
 	"github.com/korolev-n/gExchange/exchanger/internal/server"
 	"github.com/korolev-n/gExchange/exchanger/internal/service"
+	"github.com/korolev-n/gExchange/exchanger/internal/transport/grpc"
 	httptransport "github.com/korolev-n/gExchange/exchanger/internal/transport/http"
 )
 
 func main() {
-	dir, _ := os.Getwd()
-	fmt.Println("Current working directory:", dir)
-	
+
 	cfg, err := config.Load()
 	if err != nil {
 		panic(err)
@@ -43,14 +42,25 @@ func main() {
 	service := service.NewExchangeService(repo)
 	handler := httptransport.New(service, logger)
 
-	srv := server.New(logger, database, handler)
+	srv := server.New(logger, database, handler) // init http
+
+	grpcHandler := grpc.New(service, logger)
+	grpcServer := grpc.NewGRPCServer(grpcHandler, logger) // init grpc
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
 	go func() {
-		if err := srv.Start(cfg.ServerPort); err != nil && err.Error() != "http: Server closed" {
-			logger.Error("Server failed", "error", err)
+		logger.Info("Starting HTTP server", "port", cfg.ServerPort)
+		if err := srv.Start(cfg.ServerPort); err != nil && err != http.ErrServerClosed {
+			logger.Error("HTTP server failed", "error", err)
+		}
+	}()
+
+	go func() {
+		logger.Info("Starting gRPC server", "port", ":50051")
+		if err := grpcServer.Start(":50051", logger); err != nil {
+			logger.Error("gRPC server failed", "error", err)
 		}
 	}()
 
@@ -62,4 +72,7 @@ func main() {
 	if err := srv.Shutdown(shutdownCtx); err != nil {
 		logger.Error("Graceful shutdown failed", "error", err)
 	}
+
+	logger.Info("Shutting down gRPC server")
+	grpcServer.Stop()
 }
