@@ -13,22 +13,22 @@ func main() {
 		panic(err)
 	}
 
-	log := logger.New(cfg.LogLevel)
+	logger := logger.New(cfg.LogLevel)
 
-	database, err := db.New(cfg.DBURL, log)
+	database, err := db.New(cfg.DBURL, logger)
 	if err != nil {
-		log.Error("Failed to connect to database", "error", err)
+		logger.Error("Failed to connect to database", "error", err)
 		return
 	}
 	defer func() {
 		if err := database.Close(); err != nil {
-			log.Error("Failed to close database", "error", err)
+			logger.Error("Failed to close database", "error", err)
 		}
 	}()
 
-	srv := server.New(log, database)
+	srv := server.New(logger, database)
 
 	if err := srv.Start(cfg.ServerPort); err != nil {
-		log.Error("Server failed", "error", err)
+		logger.Error("Server failed", "error", err)
 	}
 }

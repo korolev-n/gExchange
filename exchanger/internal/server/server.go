@@ -10,13 +10,13 @@ import (
 )
 
 type Server struct {
-	log *slog.Logger
+	logger *slog.Logger
 	db  *sql.DB
 }
 
 func New(log *slog.Logger, db *sql.DB) *Server {
 	return &Server{
-		log: log,
+		logger: log,
 		db:  db,
 	}
 }
@@ -31,7 +31,7 @@ const (
 
 func (s *Server) Start(port string) error {
 
-	s.log.Info("Starting server", "port", port)
+	s.logger.Info("Starting server", "port", port)
 
 	server := &http.Server{
 		Addr:    ":" + port,
@@ -50,7 +50,7 @@ func (s *Server) addContextMiddleware(next http.Handler) http.Handler {
 		ctx = context.WithValue(ctx, MethodKey, r.Method)
 		ctx = context.WithValue(ctx, PathKey, r.URL.Path)
 
-		logger := s.log.With(
+		logger := s.logger.With(
 			slog.String("request_id", requestID),
 			slog.String("method", r.Method),
 			slog.String("path", r.URL.Path),
