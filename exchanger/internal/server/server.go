@@ -5,18 +5,22 @@ import (
 	"database/sql"
 	"log/slog"
 	"net/http"
+
+	httptransport "github.com/korolev-n/gExchange/exchanger/internal/transport/http"
 )
 
 type Server struct {
-	logger *slog.Logger
-	db     *sql.DB
-	http   *http.Server
+	logger  *slog.Logger
+	db      *sql.DB
+	http    *http.Server
+	handler *httptransport.Handler
 }
 
-func New(log *slog.Logger, db *sql.DB) *Server {
+func New(log *slog.Logger, db *sql.DB, handler *httptransport.Handler) *Server {
 	return &Server{
-		logger: log,
-		db:     db,
+		logger:  log,
+		db:      db,
+		handler: handler,
 	}
 }
 

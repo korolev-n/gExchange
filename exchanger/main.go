@@ -10,7 +10,10 @@ import (
 	"github.com/korolev-n/gExchange/exchanger/internal/config"
 	"github.com/korolev-n/gExchange/exchanger/internal/db"
 	"github.com/korolev-n/gExchange/exchanger/internal/logger"
+	"github.com/korolev-n/gExchange/exchanger/internal/repository"
 	"github.com/korolev-n/gExchange/exchanger/internal/server"
+	"github.com/korolev-n/gExchange/exchanger/internal/service"
+	httptransport "github.com/korolev-n/gExchange/exchanger/internal/transport/http"
 )
 
 func main() {
@@ -32,7 +35,11 @@ func main() {
 		}
 	}()
 
-	srv := server.New(logger, database)
+	repo := repository.NewPostgresRepo(database)
+	service := service.NewExchangeService(repo)
+	handler := httptransport.New(service, logger)
+
+	srv := server.New(logger, database, handler)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()

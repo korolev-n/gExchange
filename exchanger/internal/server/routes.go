@@ -14,6 +14,7 @@ func (s *Server) routes() http.Handler {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Get("/healthz", s.handleHealthz)
+	r.Get("/rates", s.handler.GetRates)
 
 	return r
 }
