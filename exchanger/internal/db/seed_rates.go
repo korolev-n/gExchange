@@ -9,7 +9,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func SeedInventoryData() {
+func SeedRatesData() {
 	_ = godotenv.Load()
 
 	dsn := os.Getenv("DB_URL")
