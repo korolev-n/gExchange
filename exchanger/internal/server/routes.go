@@ -20,5 +20,7 @@ func (s *Server) routes() http.Handler {
 
 func (s *Server) handleHealthz(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("ok"))
+	if _, err := w.Write([]byte("ok")); err != nil {
+		s.logger.Error("Failed to write response", "error", err)
+	}
 }

@@ -20,21 +20,13 @@ func New(log *slog.Logger, db *sql.DB) *Server {
 	}
 }
 
-type contextKey string
-
-const (
-	RequestIDKey contextKey = "request_id"
-	MethodKey    contextKey = "method"
-	PathKey      contextKey = "path"
-)
-
 func (s *Server) Start(port string) error {
 
 	s.http = &http.Server{
 		Addr:    ":" + port,
 		Handler: s.routes(),
 	}
-	
+
 	s.logger.Info("Starting server", "port", port)
 	return s.http.ListenAndServe()
 }
