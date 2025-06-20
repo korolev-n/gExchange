@@ -1,7 +1,7 @@
 .PHONY: run test
 
 run:
-	go run main.go
+	go run cmd/server/main.go
 
 test:
 	go test -v -race ./...
