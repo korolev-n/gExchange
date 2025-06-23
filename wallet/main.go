@@ -32,7 +32,7 @@ func main() {
 		}
 	}()
 
-	srv := server.New(logger, database)
+	srv := server.New(logger, database, cfg)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()

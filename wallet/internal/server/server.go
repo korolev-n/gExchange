@@ -5,18 +5,22 @@ import (
 	"database/sql"
 	"log/slog"
 	"net/http"
+
+	"github.com/korolev-n/gExchange/exchanger/internal/config"
 )
 
 type Server struct {
 	logger *slog.Logger
 	db     *sql.DB
 	http   *http.Server
+	cfg    *config.Config
 }
 
-func New(log *slog.Logger, db *sql.DB) *Server {
+func New(log *slog.Logger, db *sql.DB, cfg *config.Config) *Server {
 	return &Server{
 		logger: log,
 		db:     db,
+		cfg:    cfg,
 	}
 }
 

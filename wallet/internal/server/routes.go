@@ -5,6 +5,9 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/korolev-n/gExchange/exchanger/internal/repository"
+	"github.com/korolev-n/gExchange/exchanger/internal/service"
+	httptransport "github.com/korolev-n/gExchange/exchanger/internal/transport/http"
 )
 
 func (s *Server) routes() http.Handler {
@@ -13,7 +16,14 @@ func (s *Server) routes() http.Handler {
 	r.Use(middleware.RequestID)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
+
+    userRepo := repository.NewUserRepository(s.db)
+    authService := service.NewAuthService(userRepo, s.cfg.JWTSecret, s.cfg.JWTExpiration)
+    authHandler := httptransport.NewAuthHandler(authService)
+
 	r.Get("/healthz", s.handleHealthz)
+	r.Post("/register", authHandler.Register)
+	r.Post("/login", authHandler.Login)
 
 	return r
 }
