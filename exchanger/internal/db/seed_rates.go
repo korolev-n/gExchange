@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"log"
+	"log/slog"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -21,7 +22,11 @@ func SeedRatesData() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer db.Close()
+	defer func() {
+		if err := db.Close(); err != nil {
+			slog.Error("Error closing database", "error", err)
+		}
+	}()
 
 	sqlStatement := `
     INSERT INTO exchange_rates (set_date, currency, rate_to_rub) VALUES

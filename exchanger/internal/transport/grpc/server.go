@@ -25,7 +25,7 @@ func (s *Server) Start(addr string, logger *slog.Logger) error {
 		return err
 	}
 
-	logger.Info("Starting gRPC server", "addr", addr)
+	//logger.Info("Starting gRPC server", "addr", addr)
 	return s.srv.Serve(lis)
 }
 

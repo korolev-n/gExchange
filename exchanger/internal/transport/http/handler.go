@@ -29,9 +29,15 @@ func (h *Handler) GetRates(w http.ResponseWriter, r *http.Request) {
 		h.Logger.Error("failed to get exchange rates", "error", err)
 
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(ErrorResponse{
+
+		encodeErr := json.NewEncoder(w).Encode(ErrorResponse{
 			Error: "Failed to retrieve exchange rates",
 		})
+
+		if encodeErr != nil {
+			h.Logger.Error("failed to encode error response", "error", encodeErr)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
 		return
 	}
 
@@ -45,5 +51,7 @@ func (h *Handler) GetRates(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(resp)
+	if err := json.NewEncoder(w).Encode(resp); err != nil {
+		h.Logger.Error("failed to encode JSON response", "error", err)
+	}
 }

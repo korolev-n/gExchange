@@ -31,7 +31,7 @@ func (s *Server) Start(port string) error {
 		Handler: s.routes(),
 	}
 
-	s.logger.Info("Starting server", "port", port)
+	//s.logger.Info("Starting server", "port", port)
 	return s.http.ListenAndServe()
 }
 

@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"log/slog"
 
 	"github.com/korolev-n/gExchange/exchanger/internal/domain"
 )
@@ -29,7 +30,11 @@ func (r *postgresRepo) GetLatestRates(ctx context.Context) ([]domain.ExchangeRat
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() {
+		if err := rows.Close(); err != nil {
+			slog.Error("Error closing rows", "error", err)
+		}
+	}()
 
 	var rates []domain.ExchangeRate
 	for rows.Next() {
