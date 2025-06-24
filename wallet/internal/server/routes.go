@@ -17,13 +17,24 @@ func (s *Server) routes() http.Handler {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
-    userRepo := repository.NewUserRepository(s.db)
-    authService := service.NewAuthService(userRepo, s.cfg.JWTSecret, s.cfg.JWTExpiration)
-    authHandler := httptransport.NewAuthHandler(authService)
+	userRepo := repository.NewUserRepository(s.db)
+	authService := service.NewAuthService(userRepo, s.cfg.JWTSecret, s.cfg.JWTExpiration)
+	authHandler := httptransport.NewAuthHandler(authService)
+
+	walletRepo := repository.NewWalletRepository(s.db)
+	walletService := service.NewWalletService(walletRepo)
+	walletHandler := httptransport.NewWalletHandler(walletService)
 
 	r.Get("/healthz", s.handleHealthz)
 	r.Post("/register", authHandler.Register)
 	r.Post("/login", authHandler.Login)
+
+	r.Group(func(r chi.Router) {
+		r.Use(httptransport.JWTAuth(s.cfg.JWTSecret))
+		r.Get("/balance", walletHandler.Balance)
+		r.Post("/wallet/deposit", walletHandler.Deposit)
+		r.Post("/wallet/withdraw", walletHandler.Withdraw)
+	})
 
 	return r
 }
