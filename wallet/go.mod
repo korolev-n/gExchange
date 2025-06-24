@@ -9,6 +9,7 @@ require (
 	github.com/korolev-n/gExchange/exchanger v0.0.0-00010101000000-000000000000
 	github.com/lib/pq v1.10.9
 	golang.org/x/crypto v0.39.0
+	golang.org/x/sync v0.15.0
 	google.golang.org/grpc v1.73.0
 )
 

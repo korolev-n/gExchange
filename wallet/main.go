@@ -8,6 +8,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/korolev-n/gExchange/wallet/internal/cache"
 	"github.com/korolev-n/gExchange/wallet/internal/client"
 	"github.com/korolev-n/gExchange/wallet/internal/config"
 	"github.com/korolev-n/gExchange/wallet/internal/db"
@@ -58,7 +59,8 @@ func main() {
 	defer grpcConn.Close()
 
 	exchangerClient := client.NewExchangerClient(grpcConn)
-	walletService := service.NewWalletService(walletRepo, exchangerClient)
+	exchangeCache := cache.NewExchangeRateCache(30 * time.Second)
+	walletService := service.NewWalletService(walletRepo, exchangerClient, exchangeCache)
 	walletHandler := httptransport.NewWalletHandler(walletService)
 
 	srv := server.New(logger, database, cfg, authHandler, walletHandler)

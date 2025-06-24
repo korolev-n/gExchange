@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/korolev-n/gExchange/wallet/internal/cache"
 	"github.com/korolev-n/gExchange/wallet/internal/repository"
 )
 
@@ -12,12 +13,21 @@ type ExchangeRateFetcher interface {
 }
 
 type WalletService struct {
-	repo       repository.WalletRepository
-	exchanger  ExchangeRateFetcher // интерфейс gRPC-клиента
+	repo      repository.WalletRepository
+	exchanger ExchangeRateFetcher // интерфейс gRPC-клиента
+	cache     *cache.ExchangeRateCache
 }
 
-func NewWalletService(repo repository.WalletRepository, exchanger ExchangeRateFetcher) *WalletService {
-	return &WalletService{repo: repo, exchanger: exchanger}
+func NewWalletService(
+	repo repository.WalletRepository,
+	exchanger ExchangeRateFetcher,
+	cache *cache.ExchangeRateCache,
+) *WalletService {
+	return &WalletService{
+		repo:      repo,
+		exchanger: exchanger,
+		cache:     cache,
+	}
 }
 
 func (s *WalletService) GetBalance(ctx context.Context, userID int64) (map[string]float64, error) {
@@ -76,7 +86,9 @@ func (s *WalletService) Exchange(ctx context.Context, userID int64, from, to str
 		return nil, 0, errors.New("insufficient funds")
 	}
 
-	rates, err := s.exchanger.GetRates(ctx)
+	rates, err := s.cache.GetOrFetch(func() (map[string]float64, error) {
+		return s.exchanger.GetRates(ctx)
+	})
 	if err != nil {
 		return nil, 0, err
 	}
