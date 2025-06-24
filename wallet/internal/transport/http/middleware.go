@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/korolev-n/gExchange/exchanger/internal/service"
+	"github.com/korolev-n/gExchange/wallet/internal/service"
 )
 
 func JWTAuth(secret string) func(http.Handler) http.Handler {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/korolev-n/gExchange/exchanger/internal/domain"
+	"github.com/korolev-n/gExchange/wallet/internal/domain"
 )
 
 type WalletRepository interface {

@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/korolev-n/gExchange/exchanger/internal/domain"
+	"github.com/korolev-n/gExchange/wallet/internal/domain"
 )
 
 type UserRepository interface {

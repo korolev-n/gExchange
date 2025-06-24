@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/korolev-n/gExchange/exchanger/internal/service"
+	"github.com/korolev-n/gExchange/wallet/internal/service"
 )
 
 type AuthHandler struct {

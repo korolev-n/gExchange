@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/korolev-n/gExchange/exchanger/internal/domain"
-	"github.com/korolev-n/gExchange/exchanger/internal/repository"
+	"github.com/korolev-n/gExchange/wallet/internal/domain"
+	"github.com/korolev-n/gExchange/wallet/internal/repository"
 	"golang.org/x/crypto/bcrypt"
 )
 
