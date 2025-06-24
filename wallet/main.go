@@ -2,15 +2,22 @@ package main
 
 import (
 	"context"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"github.com/korolev-n/gExchange/exchanger/internal/config"
-	"github.com/korolev-n/gExchange/exchanger/internal/db"
-	"github.com/korolev-n/gExchange/exchanger/internal/logger"
-	"github.com/korolev-n/gExchange/exchanger/internal/server"
+	"github.com/korolev-n/gExchange/wallet/internal/client"
+	"github.com/korolev-n/gExchange/wallet/internal/config"
+	"github.com/korolev-n/gExchange/wallet/internal/db"
+	"github.com/korolev-n/gExchange/wallet/internal/logger"
+	"github.com/korolev-n/gExchange/wallet/internal/repository"
+	"github.com/korolev-n/gExchange/wallet/internal/server"
+	"github.com/korolev-n/gExchange/wallet/internal/service"
+	httptransport "github.com/korolev-n/gExchange/wallet/internal/transport/http"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
@@ -32,7 +39,29 @@ func main() {
 		}
 	}()
 
-	srv := server.New(logger, database, cfg)
+	userRepo := repository.NewUserRepository(database)
+	authService := service.NewAuthService(userRepo, cfg.JWTSecret, cfg.JWTExpiration)
+	authHandler := httptransport.NewAuthHandler(authService)
+
+	walletRepo := repository.NewWalletRepository(database)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	grpcConn, err := grpc.NewClient(
+		"localhost:50051",
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		log.Fatalf("failed to connect to exchanger service: %v", err)
+	}
+	defer grpcConn.Close()
+
+	exchangerClient := client.NewExchangerClient(grpcConn)
+	walletService := service.NewWalletService(walletRepo, exchangerClient)
+	walletHandler := httptransport.NewWalletHandler(walletService)
+
+	srv := server.New(logger, database, cfg, authHandler, walletHandler)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()

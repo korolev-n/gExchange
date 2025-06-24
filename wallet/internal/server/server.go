@@ -6,21 +6,32 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/korolev-n/gExchange/exchanger/internal/config"
+	"github.com/korolev-n/gExchange/wallet/internal/config"
+	httptransport "github.com/korolev-n/gExchange/wallet/internal/transport/http"
 )
 
 type Server struct {
-	logger *slog.Logger
-	db     *sql.DB
-	http   *http.Server
-	cfg    *config.Config
+	logger        *slog.Logger
+	db            *sql.DB
+	cfg           *config.Config
+	http          *http.Server
+	authHandler   *httptransport.AuthHandler
+	walletHandler *httptransport.WalletHandler
 }
 
-func New(log *slog.Logger, db *sql.DB, cfg *config.Config) *Server {
+func New(
+	logger *slog.Logger,
+	db *sql.DB,
+	cfg *config.Config,
+	authHandler *httptransport.AuthHandler,
+	walletHandler *httptransport.WalletHandler,
+) *Server {
 	return &Server{
-		logger: log,
-		db:     db,
-		cfg:    cfg,
+		logger:        logger,
+		db:            db,
+		cfg:           cfg,
+		authHandler:   authHandler,
+		walletHandler: walletHandler,
 	}
 }
 
