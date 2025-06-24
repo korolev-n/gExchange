@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/korolev-n/gExchange/exchanger/internal/service"
+	"github.com/korolev-n/gExchange/wallet/internal/service"
 )
 
 type WalletHandler struct {
@@ -45,8 +45,8 @@ func (h *WalletHandler) Deposit(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(map[string]any{
-		"message":      "Account topped up successfully",
-		"new_balance":  balance,
+		"message":     "Account topped up successfully",
+		"new_balance": balance,
 	})
 }
 
@@ -65,7 +65,35 @@ func (h *WalletHandler) Withdraw(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(map[string]any{
-		"message":      "Withdrawal successful",
-		"new_balance":  balance,
+		"message":     "Withdrawal successful",
+		"new_balance": balance,
+	})
+}
+
+type exchangeRequest struct {
+	FromCurrency string  `json:"from_currency"`
+	ToCurrency   string  `json:"to_currency"`
+	Amount       float64 `json:"amount"`
+}
+
+func (h *WalletHandler) Exchange(w http.ResponseWriter, r *http.Request) {
+	claims := r.Context().Value("user_claims").(*service.Claims)
+
+	var req exchangeRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, `{"error":"invalid input"}`, http.StatusBadRequest)
+		return
+	}
+
+	balances, exchanged, err := h.walletService.Exchange(r.Context(), claims.UserID, req.FromCurrency, req.ToCurrency, req.Amount)
+	if err != nil {
+		http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusBadRequest)
+		return
+	}
+
+	json.NewEncoder(w).Encode(map[string]any{
+		"message":          "Exchange successful",
+		"exchanged_amount": exchanged,
+		"new_balance":      balances,
 	})
 }
