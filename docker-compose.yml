@@ -1,14 +1,15 @@
 services:
   postgres:
     image: postgres:15-alpine
+    container_name: postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
     ports:
-      - "5432:5432"
+      - "6543:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - exchange-net
 
@@ -19,11 +20,8 @@ services:
     depends_on:
       - postgres
     environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-      DB_NAME: postgres
+      DB_URL: postgres://postgres:postgres@postgres:5432/exchanger?sslmode=disable
+      SERVER_PORT: 8080
     ports:
       - "8081:8080"
       - "50051:50051"
@@ -38,11 +36,8 @@ services:
       - postgres
       - exchanger
     environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-      DB_NAME: postgres
+      DB_URL: postgres://postgres:postgres@postgres:5432/wallet?sslmode=disable
+      SERVER_PORT: 8080
       EXCHANGER_GRPC_ADDR: exchanger:50051
     ports:
       - "8080:8080"
