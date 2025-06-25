@@ -6,7 +6,8 @@ require (
 	github.com/go-chi/chi/v5 v5.2.1
 	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/joho/godotenv v1.5.1
-	github.com/korolev-n/gExchange/exchanger v0.0.0-00010101000000-000000000000
+	github.com/korolev-n/gExchange/exchanger v0.0.0-20250624100042-0ac1fc89fab8
+	github.com/korolev-n/gExchange/shared/api v0.0.0-00010101000000-000000000000
 	github.com/lib/pq v1.10.9
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/crypto v0.39.0
@@ -25,4 +26,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/korolev-n/gExchange/exchanger => ../exchanger
+replace github.com/korolev-n/gExchange/shared/api => ../shared/api

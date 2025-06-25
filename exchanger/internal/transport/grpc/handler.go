@@ -4,7 +4,7 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/korolev-n/gExchange/exchanger/api"
+	"github.com/korolev-n/gExchange/shared/api"
 	"github.com/korolev-n/gExchange/exchanger/internal/service"
 )
 
