@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"net"
 
-	"github.com/korolev-n/gExchange/exchanger/api"
+	"github.com/korolev-n/gExchange/shared/api"
 	"google.golang.org/grpc"
 )
 
