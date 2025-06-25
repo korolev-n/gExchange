@@ -1,0 +1,98 @@
+openapi: 3.0.0
+info:
+  title: Wallet API
+  version: 1.0.0
+paths:
+  /register:
+    post:
+      summary: Register user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Registered
+  /login:
+    post:
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: JWT token
+  /balance:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Get balance
+      responses:
+        '200':
+          description: User balance
+  /wallet/deposit:
+    post:
+      security:
+        - bearerAuth: []
+      summary: Deposit currency
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                currency:
+                  type: string
+                amount:
+                  type: number
+  /wallet/withdraw:
+    post:
+      security:
+        - bearerAuth: []
+      summary: Withdraw currency
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                currency:
+                  type: string
+                amount:
+                  type: number
+  /exchange:
+    post:
+      security:
+        - bearerAuth: []
+      summary: Exchange currency
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                from_currency:
+                  type: string
+                to_currency:
+                  type: string
+                amount:
+                  type: number
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
