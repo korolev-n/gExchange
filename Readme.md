@@ -1,5 +1,15 @@
 **Цель проекта:** улучшение навыков разработки микросервисов (gRPC + HTTP REST).
 
+## Технологии
+
+- **Язык**: Go (v1.24)
+- **API**: HTTP REST, gRPC
+- **База данных**: PostgreSQL
+- **Контейнеризация**: Docker, Docker Compose
+- **Кэш**: В памяти + singleflight
+- **JWT**: golang-jwt/jwt
+- **Логирование**: slog
+
 ## `exchanger` — сервис обмена валют
 
 - Отвечает за хранение и предоставление курсов валют.
@@ -32,6 +42,31 @@ client --> wallet (REST) --> exchanger (gRPC)
 
 - Курсы валют кэшируются.
 - Если кэш устарел, `wallet` вызывает `GetRates()` у `exchanger`.
+
+## Конфигурация `.env`
+
+### wallet/.env
+
+- `DB_URL` — строка подключения к PostgreSQL
+- `JWT_SECRET` — секрет для подписи JWT
+- `JWT_EXPIRATION_HOURS` — срок действия токена
+- `SERVER_PORT` — порт HTTP API
+- `LOG_LEVEL` - детализация логирования (debug, info, warn)
+
+```
+// .env.example
+
+DB_URL=postgres://user:pa55word@localhost:5432/wallet?sslmode=disable
+SERVER_PORT=8080
+LOG_LEVEL=debug
+JWT_EXPIRATION_HOURS=24
+JWT_SECRET=secret_key
+```
+### exchanger/.env
+
+- `DB_URL` — строка подключения к PostgreSQL
+- `SERVER_PORT` — порт HTTP API
+- `LOG_LEVEL` - детализация логирования (debug, info, warn)
 
 ## Инструкция запуска через Docker
 
